@@ -1,13 +1,19 @@
 package com.beyond233.jwtlearn.controller;
 
-import com.sun.org.apache.xpath.internal.objects.XString;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.auth0.jwt.exceptions.AlgorithmMismatchException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.beyond233.jwtlearn.pojo.User;
+import com.beyond233.jwtlearn.service.AuthService;
+import com.beyond233.jwtlearn.util.JWTUtil;
+import com.beyond233.jwtlearn.util.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+
 /**
  *  认证
  *
@@ -16,6 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    @Autowired
+    private AuthService authService;
 
     /**
      * 模拟传统的session认证机制：
@@ -30,6 +39,48 @@ public class AuthController {
         // 模拟认证成功，服务器会将用户信息存入session中
         request.getSession().setAttribute("username",username);
         return "login success!";
-
     }
+
+    /**
+     * 登录
+     * */
+    @PostMapping("/login")
+    public Result login(User user){
+        User loginUser = authService.loginAuth(user);
+        if (loginUser == null) {
+            return Result.fail();
+        }
+        HashMap<String, String> payload = new HashMap<>();
+        payload.put("userId", String.valueOf(loginUser.getId()));
+        payload.put("username", loginUser.getName());
+        String token = JWTUtil.generate(payload);
+        return Result.success("login success",token);
+    }
+
+    /**
+     * token校验
+     * */
+    @PostMapping("/token/verify")
+    public Result tokenAuth(@RequestParam("token") String token) {
+        if (token == null) {
+            return Result.error("token不能为空", null);
+        }
+        try {
+            DecodedJWT jwt = JWTUtil.decode(token);
+            if (jwt == null) {
+                return Result.fail("无效token!");
+            }
+            HashMap<String, String> map = new HashMap<>();
+            map.put("userId", jwt.getClaim("userId").asString());
+            map.put("username", jwt.getClaim("username").asString());
+            return Result.success("login success",map);
+        } catch (SignatureVerificationException e) {
+            return Result.fail("无效签名！");
+        }catch (TokenExpiredException e){
+            return Result.fail("token已经过期！");
+        }catch (AlgorithmMismatchException e){
+            return Result.fail("token算法不一致！");
+        }
+    }
+
 }
