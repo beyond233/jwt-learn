@@ -4,10 +4,14 @@ import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.beyond233.jwtlearn.constant.Constants;
+import com.beyond233.jwtlearn.constant.Permission;
+import com.beyond233.jwtlearn.constant.Role;
 import com.beyond233.jwtlearn.pojo.User;
 import com.beyond233.jwtlearn.service.AuthService;
 import com.beyond233.jwtlearn.util.JWTUtil;
 import com.beyond233.jwtlearn.util.Result;
+import com.sun.org.apache.bcel.internal.classfile.ConstantString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +57,8 @@ public class AuthController {
         HashMap<String, String> payload = new HashMap<>();
         payload.put("userId", String.valueOf(loginUser.getId()));
         payload.put("username", loginUser.getName());
+        payload.put(Constants.ROLE, Role.ADMIN.equals(loginUser.getName()) ? Role.ADMIN : Role.USER);
+        payload.put(Constants.PERMISSION, Role.ADMIN.equals(loginUser.getName()) ? Permission.SUPREME : Permission.QUERY);
         String token = JWTUtil.generate(payload);
         return Result.success("login success",token);
     }
@@ -70,7 +76,7 @@ public class AuthController {
             if (jwt == null) {
                 return Result.fail("无效token!");
             }
-            HashMap<String, String> map = new HashMap<>();
+            HashMap<String, String> map = new HashMap<>(2);
             map.put("userId", jwt.getClaim("userId").asString());
             map.put("username", jwt.getClaim("username").asString());
             return Result.success("login success",map);

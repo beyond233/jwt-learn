@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * @author BEYOND
  * */
-@Slf4j(topic = "JWT")
+@Slf4j(topic = "JWT工具")
 public class JWTUtil {
 
     /**
@@ -44,7 +44,7 @@ public class JWTUtil {
         Map<String, Object> header = new HashMap<>();
         // 设置token过期时间: 默认7天过期
         Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.SECOND, 7);
+        instance.add(Calendar.MINUTE, 3);
         Date expireTime = instance.getTime();
         // 设置payload
         payloadMap.forEach(builder::withClaim);
@@ -91,7 +91,8 @@ public class JWTUtil {
             decodedJWT = jwtVerifier.verify(tokenStr);
         } catch (IllegalArgumentException | JWTVerificationException e) {
             // 验签失败
-            e.printStackTrace();
+            log.info("正在校验token:  "+tokenStr);
+            log.info("token校验失败原因-------------->"+e.getMessage());
             throw e;
         }
         // 验签成功，返回解密后的token对象
