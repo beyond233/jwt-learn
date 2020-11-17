@@ -10,8 +10,14 @@ spring:
     url: jdbc:mysql://localhost:3306/cloud?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
     password: root
+  profiles:
+    active: dev
 
 #mybatis
 mybatis:
   mapper-locations: classpath:/mapper/*.xml
   type-aliases-package: com.beyond233.jwtlearn.pojo
+
+#自定义配置
+auth:
+  enable: true

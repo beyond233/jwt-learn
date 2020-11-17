@@ -1,6 +1,7 @@
 package com.beyond233.jwtlearn.pojo;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 描述: 用户实体类
@@ -9,6 +10,7 @@ import lombok.Data;
  * @since 2020/10/18 19:03
  */
 @Data
+@Accessors(chain=true)
 public class User {
 
     private Integer id;

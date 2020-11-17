@@ -6,9 +6,13 @@ import com.beyond233.jwtlearn.annotation.RequiredPermission;
 import com.beyond233.jwtlearn.annotation.RequiredRole;
 import com.beyond233.jwtlearn.constant.Permission;
 import com.beyond233.jwtlearn.constant.Role;
+import com.beyond233.jwtlearn.pojo.User;
 import com.beyond233.jwtlearn.util.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * 描述: 模拟业务Controller
@@ -20,10 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/my")
 public class BusinessController {
 
+    @Autowired(required = false)
+    private User beyond;
+
     @RequestMapping("/name")
     @NotNeedLogin
     public Result<String> nameInfo() {
-        return Result.success("您的名字：徐可爱！");
+        return Result.success(beyond != null ? beyond.getName() : "您的名字：徐可爱！");
     }
 
     @RequestMapping("/age")
@@ -38,6 +45,5 @@ public class BusinessController {
     public Result<String> resetPassword() {
         return Result.success("你的密码是：beyond");
     }
-
 
 }
