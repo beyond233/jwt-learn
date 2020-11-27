@@ -48,6 +48,7 @@ public class JWTInterceptor implements HandlerInterceptor {
         Method processMethod = null;
         for (Method method : clazz.getMethods()) {
             processMethod = method;
+            // 获取controller中所有的请求URL
             String[] controllerUriPrefixArr = clazz.getAnnotation(RequestMapping.class).value();
             String controllerUriPrefix = controllerUriPrefixArr.length > 0 ? controllerUriPrefixArr[0] : "";
             String[] methodUriPrefixArr = method.getAnnotation(RequestMapping.class).value();
@@ -60,8 +61,6 @@ public class JWTInterceptor implements HandlerInterceptor {
                     break;
                 }
             }
-
-
         }
 
         // 从请求头中获取token
