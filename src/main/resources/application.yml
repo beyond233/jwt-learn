@@ -22,4 +22,4 @@ mybatis:
 auth:
   enable: true
 
-commit: 2
+commit: 3
